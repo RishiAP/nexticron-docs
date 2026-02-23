@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A top-level Java library (e.g. Tiler, Logger, GDSLib)
+model Library {
+  id        String           @id @default(cuid())
+  name      String           @unique // e.g. "Tiler"
+  slug      String           @unique // e.g. "tiler" — used in URLs
+  order     Int              @default(0) // sidebar sort order
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  versions  LibraryVersion[]
+
+  @@map("libraries")
+}
+
+/// A version of a library (e.g. 1.0.0)
+model LibraryVersion {
+  id        String   @id @default(cuid())
+  version   String // e.g. "1.0.0" (stored without 'v' prefix)
+  libraryId String
+  library   Library  @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  docs      Doc[]
+
+  @@unique([libraryId, version])
+
+  @@map("library_versions")
+}
+
+/// A single documentation page
+model Doc {
+  id               String         @id @default(cuid())
+  title            String // e.g. "Cell.java"
+  slug             String // e.g. "cell-java" — used in URLs
+  content          String         @db.Text // Markdown content
+  parentPath       String         @default("") // e.g. "TilerExceptions" for nested files
+  order            Int            @default(0)
+  published        Boolean        @default(false)
+  libraryVersionId String
+  libraryVersion   LibraryVersion @relation(fields: [libraryVersionId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([libraryVersionId, slug, parentPath])
+  @@index([libraryVersionId])
+
+  @@map("docs")
+}

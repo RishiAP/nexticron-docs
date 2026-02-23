@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -80,6 +81,12 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Syntax token colors */
+  --code-keyword: var(--destructive);
+  --code-string: var(--chart-2);
+  --code-number: var(--primary);
+  --code-function: var(--chart-3);
+  --code-comment: var(--muted-foreground);
 }
 
 .dark {
@@ -114,6 +121,12 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  /* Syntax token colors */
+  --code-keyword: var(--destructive);
+  --code-string: var(--chart-2);
+  --code-number: var(--primary);
+  --code-function: var(--chart-3);
+  --code-comment: var(--muted-foreground);
 }
 
 @layer base {
@@ -121,6 +134,305 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
+}
+
+/* ─── Scrollbar Styling ──────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0 0 / 30%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0 0 / 50%);
+}
+
+/* ─── Better prose for published docs ─────────────────── */
+.prose {
+  --tw-prose-body: var(--foreground);
+  line-height: 1.8;
+}
+
+.prose h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: 2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-top: 2rem;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+}
+
+.prose p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose :not(pre) > code {
+  background: var(--muted);
+  color: var(--primary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+  font-style: normal;
+}
+
+.prose a {
+  color: var(--primary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s;
+}
+
+.prose a:hover {
+  opacity: 0.8;
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.prose th {
+  background: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+.prose hr {
+  border-color: var(--border);
+  margin: 2rem 0;
+}
+
+/* ─── Shiki dual-theme (rehype-pretty-code) ──────────── */
+/* Light mode: show light theme spans, hide dark */
+[data-rehype-pretty-code-figure] code > [data-line] .light {
+  display: inline;
+}
+[data-rehype-pretty-code-figure] code > [data-line] .dark {
+  display: none;
+}
+/* Dark mode: show dark theme spans, hide light */
+.dark [data-rehype-pretty-code-figure] code > [data-line] .dark {
+  display: inline;
+}
+.dark [data-rehype-pretty-code-figure] code > [data-line] .light {
+  display: none;
+}
+
+/* rehype-pretty-code: use proper theme backgrounds */
+[data-rehype-pretty-code-figure] pre {
+  background: transparent !important;
+}
+
+[data-rehype-pretty-code-figure] code {
+  display: grid;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: inherit;
+}
+
+/* Shiki syntax highlighting - apply color variables */
+code span {
+  color: var(--shiki-light);
+}
+
+.dark code span {
+  color: var(--shiki-dark);
+}
+
+[data-rehype-pretty-code-figure] [data-line] {
+  padding: 0 1rem;
+}
+
+/* Highlighted lines */
+[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  background: var(--accent);
+  border-left: 2px solid var(--primary);
+}
+
+/* Inline code styling from rehype-pretty-code */
+[data-rehype-pretty-code-figure] code[data-line-numbers] {
+  counter-reset: line;
+}
+
+[data-rehype-pretty-code-figure] code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1.5rem;
+  text-align: right;
+  color: var(--muted-foreground);
+  opacity: 0.5;
+}
+
+/* Tiptap Editor Theming */
+.tiptap {
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap pre {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.tiptap pre code {
+  color: inherit;
+  padding: 0;
+  background: none;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+
+/* Syntax highlighting - Keywords (if, function, class, etc.) */
+.tiptap .hljs-keyword,
+.tiptap .hljs-selector-tag,
+[data-rehype-pretty-code-figure] .hljs-keyword,
+[data-rehype-pretty-code-figure] .hljs-selector-tag {
+  color: var(--code-keyword);
+}
+
+/* Syntax highlighting - Strings and attributes */
+.tiptap .hljs-string,
+.tiptap .hljs-attr,
+[data-rehype-pretty-code-figure] .hljs-string,
+[data-rehype-pretty-code-figure] .hljs-attr {
+  color: var(--code-string);
+}
+
+/* Syntax highlighting - Numbers and literals */
+.tiptap .hljs-number,
+.tiptap .hljs-literal,
+[data-rehype-pretty-code-figure] .hljs-number,
+[data-rehype-pretty-code-figure] .hljs-literal {
+  color: var(--code-number);
+}
+
+/* Syntax highlighting - Functions and built-ins */
+.tiptap .hljs-title,
+.tiptap .hljs-function,
+.tiptap .hljs-built_in,
+[data-rehype-pretty-code-figure] .hljs-title,
+[data-rehype-pretty-code-figure] .hljs-function,
+[data-rehype-pretty-code-figure] .hljs-built_in {
+  color: var(--code-function);
+}
+
+/* Syntax highlighting - Comments */
+.tiptap .hljs-comment,
+.tiptap .hljs-quote,
+[data-rehype-pretty-code-figure] .hljs-comment,
+[data-rehype-pretty-code-figure] .hljs-quote {
+  color: var(--code-comment);
+}
+
+.tiptap code {
+  background: var(--muted);
+  color: var(--primary);
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.tiptap blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+}
+
+.tiptap hr {
+  border-color: var(--border);
+  margin: 1.5rem 0;
+}
+
+.tiptap a {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.tiptap mark {
+  background-color: oklch(0.9 0.15 90);
+  border-radius: 0.15rem;
+  padding: 0.05rem 0.15rem;
+}
+
+.dark .tiptap mark {
+  background-color: oklch(0.5 0.15 90);
+}
+
+/* Tiptap Table Styles */
+.tiptap table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.tiptap th,
+.tiptap td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  min-width: 100px;
+}
+
+.tiptap th {
+  background: var(--muted);
+  font-weight: 600;
+}
+
+.tiptap .selectedCell {
+  background: var(--accent);
 }

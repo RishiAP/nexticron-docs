@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ClerkThemeProvider } from "@/components/clerk-theme-provider";
+import { QueryProvider } from "@/components/query-provider";
 
 export const metadata: Metadata = {
-  title: "NextICron Tiling Engine Documentation",
-  description: "Documentation for the NextICron SRAM Tiling Engine",
+  title: "NextICron Docs",
+  description: "Documentation NextICron Libraries",
 };
 
 export default function RootLayout({
@@ -23,9 +23,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ClerkThemeProvider>
+          <QueryProvider>
             <TooltipProvider>{children}</TooltipProvider>
-          </ClerkThemeProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

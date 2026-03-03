@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireSuperAdmin } from "@/lib/auth"
+import { requireAdmin } from "@/lib/auth"
 
 type Params = { params: Promise<{ id: string }> }
 
 // DELETE /api/admin/versions/[id]
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const { id } = await params
     await prisma.libraryVersion.delete({ where: { id } })
     return NextResponse.json({ success: true })

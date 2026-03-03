@@ -1,14 +1,24 @@
-import { auth, currentUser } from "@clerk/nextjs/server"
+/**
+ * Re-export auth helpers for backward compatibility.
+ * All logic lives in @/lib/auth/*.
+ */
+export {
+  isAdmin,
+  getCurrentUser,
+  getSession,
+  requireAuth,
+  requireAdmin,
+  requireRole,
+  requireProjectPermission,
+  getUserProjectPermissions,
+} from "./auth/helpers"
 
-export async function isSuperAdmin(): Promise<boolean> {
-  const user = await currentUser()
-  if (!user) return false
-  return (user.publicMetadata as { role?: string })?.role === "super-admin"
-}
+export type {
+  AuthUser,
+  SessionPayload,
+  ProjectPermission,
+  AuthAdapter,
+  AuthenticateResult,
+} from "./auth/types"
 
-export async function requireSuperAdmin() {
-  const isAdmin = await isSuperAdmin()
-  if (!isAdmin) {
-    throw new Error("Unauthorized: Super admin access required")
-  }
-}
+export { ProjectRole } from "./auth/types"

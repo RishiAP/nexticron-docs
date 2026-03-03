@@ -12,13 +12,14 @@ datasource db {
 
 /// A top-level Java library (e.g. Tiler, Logger, GDSLib)
 model Library {
-  id        String           @id @default(cuid())
-  name      String           @unique // e.g. "Tiler"
-  slug      String           @unique // e.g. "tiler" — used in URLs
-  order     Int              @default(0) // sidebar sort order
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  versions  LibraryVersion[]
+  id                     String                   @id @default(cuid())
+  name                   String                   @unique // e.g. "Tiler"
+  slug                   String                   @unique // e.g. "tiler" — used in URLs
+  order                  Int                      @default(0) // sidebar sort order
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  versions               LibraryVersion[]
+  groupPermissionMappings GroupPermissionMapping[]
 
   @@map("libraries")
 }
@@ -52,8 +53,61 @@ model Doc {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
-  @@unique([libraryVersionId, slug, parentPath])
+  @@unique([libraryVersionId, parentPath, slug])
+  @@unique([libraryVersionId, parentPath, title])
   @@index([libraryVersionId])
 
   @@map("docs")
+}
+
+/// Project role enum for group permission mappings
+enum ProjectRole {
+  EDITOR
+  VIEWER
+}
+
+/// Maps FreeIPA groups to library-level permissions.
+/// e.g. group "project-tiler-editors" → library "Tiler", role "editor"
+model GroupPermissionMapping {
+  id        String      @id @default(cuid())
+  groupName String // FreeIPA group name, e.g. "project-tiler-editors"
+  libraryId String
+  library   Library     @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  role      ProjectRole
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([groupName, libraryId])
+  @@index([groupName])
+
+  @@map("group_permission_mappings")
+}
+
+/// Internal user identity. Created on first successful LDAP login.
+/// LDAP groups and admin status are cached in Redis (not in this table)
+/// to avoid LDAP queries on every SSR page load.
+model User {
+  id            String         @id @default(uuid())
+  username      String         @unique // LDAP uid
+  email         String         @default("")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+/// Hashed refresh tokens linked to a user.
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique // SHA-256 hash of the raw refresh token
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+
+  @@map("refresh_tokens")
 }

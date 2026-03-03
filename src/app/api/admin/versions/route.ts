@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireSuperAdmin } from "@/lib/auth"
+import { requireAdmin } from "@/lib/auth"
 import { cleanVersion } from "@/lib/utils"
 
 // POST /api/admin/versions — create a new library version
 export async function POST(req: NextRequest) {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const body = await req.json()
-    let { version, libraryId } = body
+    let { version } = body
+    const { libraryId } = body
 
     if (!version || !libraryId) {
       return NextResponse.json({ error: "Version and libraryId are required" }, { status: 400 })

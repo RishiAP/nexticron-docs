@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireSuperAdmin } from "@/lib/auth"
+import { requireAdmin } from "@/lib/auth"
 
 type Params = { params: Promise<{ id: string }> }
 
 // GET /api/admin/libraries/[id]
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const { id } = await params
     const library = await prisma.library.findUnique({
       where: { id },
@@ -33,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // PATCH /api/admin/libraries/[id]
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const { id } = await params
     const body = await req.json()
     const library = await prisma.library.update({
@@ -52,7 +52,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 // DELETE /api/admin/libraries/[id]
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const { id } = await params
     await prisma.library.delete({ where: { id } })
     return NextResponse.json({ success: true })

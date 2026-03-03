@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireSuperAdmin } from "@/lib/auth"
+import { requireAdmin } from "@/lib/auth"
 
 // GET /api/admin/libraries — list all libraries
 export async function GET() {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const libraries = await prisma.library.findMany({
       orderBy: { order: "asc" },
       include: {
@@ -27,7 +27,7 @@ export async function GET() {
 // POST /api/admin/libraries — create a new library
 export async function POST(req: NextRequest) {
   try {
-    await requireSuperAdmin()
+    await requireAdmin()
     const body = await req.json()
     const { name, slug, order } = body
 

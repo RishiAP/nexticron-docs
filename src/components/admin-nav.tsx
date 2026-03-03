@@ -17,7 +17,7 @@ export function AdminNav() {
 
   const navItems = [
     { href: "/admin", label: "Libraries" },
-    { href: "/admin/docs", label: "Documentation" },
+    { href: "/admin/permissions", label: "Permissions" },
     { href: "/", label: "← Back to Docs" },
   ]
 
